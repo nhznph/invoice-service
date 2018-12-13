@@ -1,0 +1,226 @@
+swagger: "2.0"
+info:
+  description: "Manage prescription"
+  version: "1.0.0"
+  title: "E-Invoice"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "petstore.swagger.io"
+basePath: "/v2"
+tags:
+- name: "Invoice"
+  description: "Everything about E-Invoice"
+schemes:
+- "https"
+- "http"
+paths:
+  /v1/invoice/{userId}:
+    post:
+      tags:
+      - "invoice"
+      summary: add a new invoice  .
+      description: add a new invoice  .
+      operationId: addInvoice
+      produces:
+      - text/plain
+      parameters:
+      - in: path
+        name: userId
+        type: string
+        description: Id of user
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Invoice object need to be add in Invoice"
+        required: true
+        schema:
+          $ref: "#/definitions/Invoice"
+      responses:
+        '200':
+          description: "successfull created"
+          schema:
+            type: string
+            description: ID of the invoice being created.
+        '400':
+          description: Bad request, validation error
+        '404':
+          description: The invoice is not found.
+        '500':
+          description: Internal Server Error
+  /v1/{userId}/invoices/{invoiceNo}:
+    put:
+      tags:
+      - "invoice"
+      summary: Update an existing invoice
+      description: just update the invoice by invoiceNo
+      operationId: updateInvoice
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: path
+        name: invoiceNo
+        description: ID of invoice to update
+        required: true
+        type: string
+      - in: path
+        name: userId
+        description: ID of user exist
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: "invoice object need to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/Invoice"
+      responses:
+        200:
+          description: "successfull update"
+          schema:
+            type: string
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Invoice not found"
+        405:
+          description: "Validation exception"
+    delete:
+      tags:
+      - "invoice"
+      summary: delete invoice by id
+      description: delete invoice by id from path
+      operationId: deleteInvoice
+      parameters:
+      - in: path
+        name: invoiceNo
+        description: ID of invoice to delete
+        required: true
+        type: string
+      - in: path
+        name: userId
+        description: ID of user exist
+        required: true
+        type: string
+      responses:
+        200:
+          description: "successfull delete"
+          schema:
+            type: string
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Invoice not found"
+        405:
+          description: "Validation exception"
+  /v1/invoices/{invoiceNo}:
+    get:
+      tags:
+      - "invoice"
+      summary: Get the invoice by  invoiceNo.
+      description: Get the invoice by invoiceNo.
+      operationId: readInvoice
+      produces:
+      - application/json
+      - text/plain
+      parameters:
+      - in: path
+        name: invoiceNo
+        type: string
+        description: invoice code
+        required: true
+      responses:
+        '200':
+          description: Invoice specified by Invoice No.
+          schema:
+            $ref: "#/definitions/Invoice"
+        '404':
+          description: The invoice is not found.
+        '500':
+          description: Internal Server Error
+  /v1/{userId}/invoice/lists:
+    get:
+      tags:
+      - "invoice"
+      summary: Get the list of invoices.
+      description: Get the list of invoices by userId.
+      operationId: readAllInvoice
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: userId
+        type: string
+        description: user Id
+        required: true
+      responses:
+        '200':
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Invoice"
+        '500':
+          description: Internal Server Error
+  /v1/{userId}/invoice/viewReport:
+    get:
+      tags:
+      - "invoice"
+      summary: Report invoice monthly / yearly.
+      description:  Report invoice monthly / yearly by userId.
+      operationId: viewReportInvoice
+      produces:
+      - application/json
+      parameters:
+      - in: path
+        name: userId
+        type: string
+        description: user Id
+        required: true
+      - in: query
+        name: period
+        type: string
+        description: changed period .
+        required: true
+      - in: query
+        name: monthly
+        description: "input month or year need view report"
+        required: true
+        type: string
+      responses:
+        '200':
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Invoice"
+        '500':
+          description: Internal Server Error
+definitions:
+  Invoice:
+    type: "object"
+    properties:
+      typeOfInvoice:
+        type: "string"
+        example: "Electric"
+      amountOfMoney:
+        type: "integer"
+        example: "300000"
+      vat:
+        type: "string"
+        example: "0.5"
+      period:
+        type: "string"
+        example: "monthly"
+      invoiceNo:
+        type: "string"
+        example: "819d15a3-9692-19ba-9974-180df0e334c1"
+      userId:
+        type: "string"
+        example: "001"
+

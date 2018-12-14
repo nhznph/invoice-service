@@ -41,7 +41,7 @@ public class V1ApiDelegateImpl implements V1ApiDelegate {
     }
 
     @Override
-    public ResponseEntity<List<Invoice>> viewReportInvoice(String userId, String period, String monthly) {
+    public ResponseEntity<List<Invoice>> viewReportInvoice(String userId, String period, Integer monthly) {
         return ResponseEntity.ok(invoiceService.viewReport(userId, period, monthly));
     }
 

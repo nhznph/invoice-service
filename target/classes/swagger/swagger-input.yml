@@ -191,7 +191,7 @@ paths:
         name: monthly
         description: "input month or year need view report"
         required: true
-        type: string
+        type: integer
       responses:
         '200':
           description: "successful operation"

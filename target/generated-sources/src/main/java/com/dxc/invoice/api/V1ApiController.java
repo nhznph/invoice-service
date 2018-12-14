@@ -47,7 +47,7 @@ public class V1ApiController implements V1Api {
         return delegate.updateInvoice(invoiceNo, userId, body);
     }
 
-    public ResponseEntity<List<Invoice>> viewReportInvoice(@ApiParam(value = "user Id",required=true) @PathVariable("userId") String userId,@NotNull @ApiParam(value = "changed period .", required = true) @Valid @RequestParam(value = "period", required = true) String period,@NotNull @ApiParam(value = "input month or year need view report", required = true) @Valid @RequestParam(value = "monthly", required = true) String monthly) {
+    public ResponseEntity<List<Invoice>> viewReportInvoice(@ApiParam(value = "user Id",required=true) @PathVariable("userId") String userId,@NotNull @ApiParam(value = "changed period .", required = true) @Valid @RequestParam(value = "period", required = true) String period,@NotNull @ApiParam(value = "input month or year need view report", required = true) @Valid @RequestParam(value = "monthly", required = true) Integer monthly) {
         return delegate.viewReportInvoice(userId, period, monthly);
     }
 

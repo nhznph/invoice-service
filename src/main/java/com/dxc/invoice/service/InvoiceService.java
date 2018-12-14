@@ -29,7 +29,7 @@ public class InvoiceService {
     public String addInvoice(String userId, Invoice invoice) {
         InvoiceEntity check = invoiceRepository.findByInvoiceNoAndDeleted(invoice.getInvoiceNo(), false);
         if (check != null) {
-            return "InvoiceNo exist";
+           throw new InvoiceException(InvoiceError.INVOICE_EXIST_BEFORE);
         } else {
             InvoiceEntity in = new InvoiceEntity();
             in.setTypeOfInvoice(invoice.getTypeOfInvoice());
@@ -41,7 +41,8 @@ public class InvoiceService {
             in.setDeleted(false);
             in.setCreateDate(new Date());
             if (!checkTypeOfInvoice(invoice.getTypeOfInvoice())) {
-                return "type Of invoice is wrong { Water, Electric, Telephone, Internet}";
+//                return "type Of invoice is wrong { Water, Electric, Telephone, Internet}";
+                throw new InvoiceException(InvoiceError.TYPE_OF_INVOICE_WRONG);
             }
             String checkMonth = checkInvoiceOfMonth(userId, in, invoice.getTypeOfInvoice());
             if (checkMonth != null) {
@@ -85,20 +86,20 @@ public class InvoiceService {
     public String deleteInvoice(String invoiceNo, String userId) {
         int count = invoiceRepository.markDeletedByInvoice(invoiceNo);
         if (count <= 0) {
-            return "InvoiceNo does not exist or deleted before";
+            throw new InvoiceException(InvoiceError.INVOICE_DOES_NOT_EXIST);
         }
-        return "delete successfully at " + invoiceNo;
+        return  invoiceNo;
     }
 
     @Transactional
     public String updateInvoice(String invoiceNo, String userId, Invoice invoice) {
         InvoiceEntity in = invoiceRepository.findByInvoiceNoAndDeleted(invoiceNo, false);
         if (in == null) {
-            return "InvoiceNo does not exist or deleted before";
+            throw new InvoiceException(InvoiceError.INVOICE_DOES_NOT_EXIST);
         } else {
             if (userId.equals(in.getUserId())) {
                 if (!checkTypeOfInvoice(invoice.getTypeOfInvoice())) {
-                    return "type Of invoice is wrong { Water, Electric, Telephone, Internet}";
+                  throw new InvoiceException(InvoiceError.TYPE_OF_INVOICE_WRONG);
                 }
                 String check = checkInvoiceOfMonth(userId, in, invoice.getTypeOfInvoice());
                 if (check != null) {
@@ -109,92 +110,103 @@ public class InvoiceService {
                 in.setVAT(invoice.getVat());
                 in.setModifiedDate(new Date());
                 invoiceRepository.saveAndFlush(in);
-                return "update successfully at " + invoiceNo;
+                return invoiceNo;
             } else {
-                return "user have no invoice";
+                throw new InvoiceException(InvoiceError.USER_HAVE_NO_INVOICE);
             }
         }
     }
 
-    public List<Invoice> viewReport(String userId, String period, String monthly) {
+    public List<Invoice> viewReport(String userId, String period, Integer monthly) {
         if (period.trim().equals("monthly")) {
-            List<InvoiceEntity> invoices = invoiceRepository.findAllByUserId(userId);
-            if (invoices.size() == 0) {
-                throw new InvoiceException(InvoiceError.USER_NOT_INVOICE, userId);
-            }
-            List<InvoiceEntity> invoiceList = new ArrayList<>();
-            int month = Integer.valueOf(monthly.trim());
-            if (month < 1 || month > 12) {
-                throw new InvoiceException(InvoiceError.MONTH_WRONG);
-            }
-            for (InvoiceEntity invoice : invoices) {
-                if (month == getMonth(invoice.getCreateDate())) {
-                    invoiceList.add(invoice);
-                }
-            }
-            if (invoiceList.size() <= 0) {
-                throw new InvoiceException(InvoiceError.NOT_FOUND);
-            }
-            System.out.println(getMoneyMonth(monthly, invoiceList));
-            return invoiceList.stream().map(this::entity2Invoice).collect(Collectors.toList());
+
+           return  null;
         } else if (period.trim().equals("yearly")) {
-            List<InvoiceEntity> invoices = invoiceRepository.findAllByUserId(userId);
-            if (invoices.size() == 0) {
-                throw new InvoiceException(InvoiceError.USER_NOT_INVOICE, userId);
-            }
-            List<InvoiceEntity> invoiceList = new ArrayList<>();
-            int year = Integer.valueOf(monthly.trim());
-            Date a = new Date();
-            if (year < 2000 || year > getYear(a)) {
-                throw new InvoiceException(InvoiceError.YEAR_WRONG);
-            }
-            double printTotalMoney = 0.0;
-            String printInvoice = " ";
-            for (InvoiceEntity invoice : invoices) {
-                if (year == getYear(invoice.getCreateDate())) {
-                    invoiceList.add(invoice);
-                }
-            }
-            if (invoiceList.size() <= 0) {
-                throw new InvoiceException(InvoiceError.NOT_FOUND);
-            }
-            // system out
-            List<InvoiceEntity> list11;
-            HashMap<Integer, List<InvoiceEntity>> listHashMap = new HashMap<>();
-            for (InvoiceEntity invoice : invoiceList) {
-                for (int i = 0; i < 12; i++) {
-                    list11 = new ArrayList<>();
-                    if (getMonth(invoice.getCreateDate()) == (i + 1)) {
-                        if (listHashMap.keySet().contains(getMonth(invoice.getCreateDate()))) {
-                            List<InvoiceEntity> invoiceList1 = listHashMap.get(i + 1);
-                            invoiceList1.add(invoice);
-                            list11 = invoiceList1;
-                        } else {
-                            list11.add(invoice);
-                        }
-                    }
-                    if (list11.size() > 0) {
-                        listHashMap.put(i + 1, list11);
-                    }
-                }
-            }
-            List<Integer> in = new ArrayList<>(listHashMap.keySet());
-            List<List<InvoiceEntity>> printInvoiceList = new ArrayList<>();
-            for (Integer integer : in) {
-                List<InvoiceEntity> invoiceList1 = listHashMap.get(integer);
-                // print
-                printInvoice += getMoneyMonth(String.valueOf(integer), invoiceList1);
-                //get total monney;
-                printTotalMoney += getTotalMoneyMonth(invoiceList1);
-                printInvoiceList.add(invoiceList1);
-            }
-            System.out.println("YEAR: " + monthly + printInvoice + "\nTOTAL OF MONEY YEAR : " + printTotalMoney);
-            //end system.out
-            return invoiceList.stream().map(this::entity2Invoice).collect(Collectors.toList());
+           return null;
         } else {
             throw new InvoiceException(InvoiceError.PERIOD_WRONG, userId);
         }
     }
+
+//    public List<Invoice> viewReport(String userId, String period, String monthly) {
+//        if (period.trim().equals("monthly")) {
+//            List<InvoiceEntity> invoices = invoiceRepository.findAllByUserId(userId);
+//            if (invoices.size() == 0) {
+//                throw new InvoiceException(InvoiceError.USER_NOT_INVOICE, userId);
+//            }
+//            List<InvoiceEntity> invoiceList = new ArrayList<>();
+//            int month = Integer.valueOf(monthly.trim());
+//            if (month < 1 || month > 12) {
+//                throw new InvoiceException(InvoiceError.MONTH_WRONG);
+//            }
+//            for (InvoiceEntity invoice : invoices) {
+//                if (month == getMonth(invoice.getCreateDate())) {
+//                    invoiceList.add(invoice);
+//                }
+//            }
+//            if (invoiceList.size() <= 0) {
+//                throw new InvoiceException(InvoiceError.NOT_FOUND);
+//            }
+//            System.out.println(getMoneyMonth(monthly, invoiceList));
+//            return invoiceList.stream().map(this::entity2Invoice).collect(Collectors.toList());
+//        } else if (period.trim().equals("yearly")) {
+//            List<InvoiceEntity> invoices = invoiceRepository.findAllByUserId(userId);
+//            if (invoices.size() == 0) {
+//                throw new InvoiceException(InvoiceError.USER_NOT_INVOICE, userId);
+//            }
+//            List<InvoiceEntity> invoiceList = new ArrayList<>();
+//            int year = Integer.valueOf(monthly.trim());
+//            Date a = new Date();
+//            if (year < 2000 || year > getYear(a)) {
+//                throw new InvoiceException(InvoiceError.YEAR_WRONG);
+//            }
+//            double printTotalMoney = 0.0;
+//            String printInvoice = " ";
+//            for (InvoiceEntity invoice : invoices) {
+//                if (year == getYear(invoice.getCreateDate())) {
+//                    invoiceList.add(invoice);
+//                }
+//            }
+//            if (invoiceList.size() <= 0) {
+//                throw new InvoiceException(InvoiceError.NOT_FOUND);
+//            }
+//            // system out
+//            List<InvoiceEntity> list11;
+//            HashMap<Integer, List<InvoiceEntity>> listHashMap = new HashMap<>();
+//            for (InvoiceEntity invoice : invoiceList) {
+//                for (int i = 0; i < 12; i++) {
+//                    list11 = new ArrayList<>();
+//                    if (getMonth(invoice.getCreateDate()) == (i + 1)) {
+//                        if (listHashMap.keySet().contains(getMonth(invoice.getCreateDate()))) {
+//                            List<InvoiceEntity> invoiceList1 = listHashMap.get(i + 1);
+//                            invoiceList1.add(invoice);
+//                            list11 = invoiceList1;
+//                        } else {
+//                            list11.add(invoice);
+//                        }
+//                    }
+//                    if (list11.size() > 0) {
+//                        listHashMap.put(i + 1, list11);
+//                    }
+//                }
+//            }
+//            List<Integer> in = new ArrayList<>(listHashMap.keySet());
+//            List<List<InvoiceEntity>> printInvoiceList = new ArrayList<>();
+//            for (Integer integer : in) {
+//                List<InvoiceEntity> invoiceList1 = listHashMap.get(integer);
+//                // print
+//                printInvoice += getMoneyMonth(String.valueOf(integer), invoiceList1);
+//                //get total monney;
+//                printTotalMoney += getTotalMoneyMonth(invoiceList1);
+//                printInvoiceList.add(invoiceList1);
+//            }
+//            System.out.println("YEAR: " + monthly + printInvoice + "\nTOTAL OF MONEY YEAR : " + printTotalMoney);
+//            //end system.out
+//            return invoiceList.stream().map(this::entity2Invoice).collect(Collectors.toList());
+//        } else {
+//            throw new InvoiceException(InvoiceError.PERIOD_WRONG, userId);
+//        }
+//    }
 
     //helper function
     private int getMonth(Date a) {

@@ -89,6 +89,6 @@ public interface V1Api {
     @RequestMapping(value = "/v1/{userId}/invoice/viewReport",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<Invoice>> viewReportInvoice(@ApiParam(value = "user Id",required=true) @PathVariable("userId") String userId,@NotNull @ApiParam(value = "changed period .", required = true) @Valid @RequestParam(value = "period", required = true) String period,@NotNull @ApiParam(value = "input month or year need view report", required = true) @Valid @RequestParam(value = "monthly", required = true) String monthly);
+    ResponseEntity<List<Invoice>> viewReportInvoice(@ApiParam(value = "user Id",required=true) @PathVariable("userId") String userId,@NotNull @ApiParam(value = "changed period .", required = true) @Valid @RequestParam(value = "period", required = true) String period,@NotNull @ApiParam(value = "input month or year need view report", required = true) @Valid @RequestParam(value = "monthly", required = true) Integer monthly);
 
 }

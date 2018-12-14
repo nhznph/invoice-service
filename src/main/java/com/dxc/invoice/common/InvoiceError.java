@@ -10,7 +10,11 @@ public enum InvoiceError {
     USER_NOT_INVOICE(2003, HttpStatus.BAD_REQUEST),
     YEAR_WRONG(2004, HttpStatus.BAD_REQUEST),
     PERIOD_WRONG(2006, HttpStatus.BAD_REQUEST),
-    MONTH_WRONG(2005, HttpStatus.BAD_REQUEST);
+    MONTH_WRONG(2005, HttpStatus.BAD_REQUEST),
+    INVOICE_EXIST_BEFORE(2007, HttpStatus.BAD_REQUEST),
+    TYPE_OF_INVOICE_WRONG(2008, HttpStatus.BAD_REQUEST),
+    INVOICE_DOES_NOT_EXIST(2009, HttpStatus.BAD_REQUEST),
+    USER_HAVE_NO_INVOICE(2010,HttpStatus.BAD_REQUEST);
 
     private final int code;
     private final HttpStatus httpStatus;

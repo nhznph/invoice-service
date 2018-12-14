@@ -48,6 +48,6 @@ public interface V1ApiDelegate {
      */
     ResponseEntity<List<Invoice>> viewReportInvoice(String userId,
         String period,
-        String monthly);
+        Integer monthly);
 
 }

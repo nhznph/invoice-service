@@ -76,7 +76,7 @@ public interface V1Api {
         @ApiResponse(code = 404, message = "Invoice not found"),
         @ApiResponse(code = 405, message = "Validation exception") })
     @RequestMapping(value = "/v1/{userId}/invoices/{invoiceNo}",
-        produces = { "application/json" }, 
+        produces = { "text/plain" }, 
         consumes = { "application/json" },
         method = RequestMethod.PUT)
     ResponseEntity<String> updateInvoice(@ApiParam(value = "ID of invoice to update",required=true) @PathVariable("invoiceNo") String invoiceNo,@ApiParam(value = "ID of user exist",required=true) @PathVariable("userId") String userId,@ApiParam(value = "invoice object need to be updated" ,required=true )  @Valid @RequestBody Invoice body);

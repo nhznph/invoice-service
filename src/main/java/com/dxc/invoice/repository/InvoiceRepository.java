@@ -23,8 +23,12 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, String> 
     @Modifying(clearAutomatically = true)
     @Query("update InvoiceEntity app set app.deleted = true, app.modifiedDate = now() where app.invoiceNo =:invoiceNo and app.deleted = false")
     int markDeletedByInvoice(@Param("invoiceNo") String invoiceNo);
-//
-//    @Query("select app from InvoiceEntity app where app.userId =:userId and app.deleted = false and year(app.createDate) =: year")
-//    List<InvoiceEntity> findInvoiceInMonthly(@Param("userId") String userId,
-//                                              @Param(" ") Integer year);
+
+    @Query("select app from InvoiceEntity app where app.userId =:userId and app.deleted = false and year(app.createDate) =:year")
+    List<InvoiceEntity> findInvoiceInYear(@Param("userId") String userId,
+                                             @Param("year") Integer year);
+
+    @Query("select app from InvoiceEntity app where app.userId =:userId and app.deleted = false and month(app.createDate) =:month")
+    List<InvoiceEntity> findInvoiceInMonth(@Param("userId") String userId,
+                                             @Param("month") Integer month);
 }

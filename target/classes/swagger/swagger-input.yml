@@ -61,7 +61,7 @@ paths:
       consumes:
       - "application/json"
       produces:
-      - "application/json"
+      - text/plain
       parameters:
       - in: path
         name: invoiceNo

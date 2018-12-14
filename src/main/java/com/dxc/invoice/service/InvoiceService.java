@@ -117,14 +117,23 @@ public class InvoiceService {
         }
     }
 
-    public List<Invoice> viewReport(String userId, String period, Integer monthly) {
+    public List<Invoice> viewReport(String userId, String period, Integer values) {
         if (period.trim().equals("monthly")) {
-
-           return  null;
+            // check year
+            if (values < 1 || values > 12) {
+                throw new InvoiceException(InvoiceError.MONTH_WRONG,values);
+            }
+            return invoiceRepository.findInvoiceInMonth(userId,values).stream()
+                    .map(this::entity2Invoice).collect(Collectors.toList());
         } else if (period.trim().equals("yearly")) {
-           return null;
+            Date a = new Date();
+            if (values < 2000 || values > getYear(a)) {
+                throw new InvoiceException(InvoiceError.YEAR_WRONG,values);
+            }
+           return invoiceRepository.findInvoiceInYear(userId,values).stream()
+                   .map(this::entity2Invoice).collect(Collectors.toList());
         } else {
-            throw new InvoiceException(InvoiceError.PERIOD_WRONG, userId);
+            throw new InvoiceException(InvoiceError.PERIOD_WRONG, period);
         }
     }
 
